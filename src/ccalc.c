@@ -1,7 +1,9 @@
 #include "tokenize/t_token_list/t_token_list.h"
 #include "log/log.h"
+#include "parse.h"
 
 #include <stddef.h>
+#include <stdio.h>
 
 t_token Token(t_token_type ty)
 {
@@ -24,4 +26,10 @@ int main(void)
 	tkl_push_back(&tokens, Integer(0));
 
 	log_token_list(tokens);
+
+	if (parse(tokens))
+		printf("ok\n");
+	else
+		printf("rip bozo\n");
+
 }
