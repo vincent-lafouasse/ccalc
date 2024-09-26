@@ -1,7 +1,9 @@
 #pragma once
 
 #include "tokenize/t_token_list/t_token_list.h"
+#include "t_parser.h"
+#include "t_parse_tree.h"
 
 #include <stdbool.h>
 
-bool parse(const t_token_list* tokens);
+t_error parse(const t_token_list* tokens);

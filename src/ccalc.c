@@ -120,10 +120,10 @@ int main(void)
 			add_history(line);
 		tokens = tokenize(line);
 		log_token_list(tokens);
-		if (parse(tokens))
-			printf("ok\n");
-		else
-			printf("rip bozo\n");
+		//if (parse(tokens))
+		//	printf("ok\n");
+		//else
+		//	printf("rip bozo\n");
 		free(line);
 		tkl_clear(&tokens);
 	}
