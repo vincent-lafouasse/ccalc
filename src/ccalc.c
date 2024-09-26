@@ -109,10 +109,10 @@ int main(void)
 
 	while ((line = readline("$ ")))
 	{
-		printf("%s\n", line);
 		if (!string_empty(line))
 			add_history(line);
 		tokens = tokenize(line);
+		log_token_list(tokens);
 		if (parse(tokens))
 			printf("ok\n");
 		else
