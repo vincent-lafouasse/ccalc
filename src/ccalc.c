@@ -4,6 +4,8 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 t_token Token(t_token_type ty)
 {
@@ -12,6 +14,48 @@ t_token Token(t_token_type ty)
 t_token Integer(int self)
 {
 	return (t_token){.type = INTEGER, .value = self};
+}
+
+size_t int_len(int n)
+{
+	char buffer[1000] = {0};
+
+	sprintf(buffer, "%d", n);
+	return strlen(buffer);
+}
+
+t_token_list* tokenize(const char* in)
+{
+	t_token_list* out = NULL;
+	int value;
+
+	while (*in)
+	{
+		switch (*in) {
+			case ' ':
+				break;
+			case '+':
+				tkl_push_back(&out, Token(PLUS));
+				break;
+			case '-':
+				tkl_push_back(&out, Token(MINUS));
+				break;
+			case 'x':
+				tkl_push_back(&out, Token(TIMES));
+				break;
+			case '/':
+				tkl_push_back(&out, Token(DIVIDES));
+				break;
+			default:
+				value = atoi(in);
+				tkl_push_back(&out, Integer(value));
+				in += int_len(value);
+				continue;
+		}
+		in++;
+	}
+
+	return out;
 }
 
 int main(void)
