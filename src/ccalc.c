@@ -24,6 +24,7 @@ int main(void)
 	tkl_push_back(&tokens, Token(RPAREN));
 	tkl_push_back(&tokens, Token(DIVIDES));
 	tkl_push_back(&tokens, Integer(0));
+	tkl_push_back(&tokens, Token(EOF_TOKEN));
 
 	log_token_list(tokens);
 
