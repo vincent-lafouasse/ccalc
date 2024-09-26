@@ -1,0 +1,10 @@
+build/
+target/
+.DS_Store
+.cache
+Testing
+.vscode
+
+local*
+*.a
+valgrind*
