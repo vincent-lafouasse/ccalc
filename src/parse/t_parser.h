@@ -1,11 +1,8 @@
 #pragma once
 
-#include "tokenize/t_token_list/t_token_list.h"
-
 #include <stddef.h>
 #include <stdbool.h>
-
-bool parse(const t_token_list* tokens);
+#include "tokenize/t_token_list/t_token_list.h"
 
 typedef enum e_parser_error_type t_parser_error_type;
 enum e_parser_error_type {
@@ -39,6 +36,11 @@ struct s_parser {
 static t_parser	parser_new(t_token_list *tokens)
 {
 	return ((t_parser){tokens, tokens});
+}
+
+static t_parser_error	rip_bozo(t_parser* state)
+{
+	return parser_error(E_UNEXPECTED_TOKEN, &state->current_token->token);
 }
 
 bool			parser_matches(const t_parser *parser, t_token_type ty);
