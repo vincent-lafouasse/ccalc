@@ -48,6 +48,7 @@ t_token_list* tokenize(const char* in)
 				tkl_push_back(&out, Token(MINUS));
 				break;
 			case 'x':
+			case '*':
 				tkl_push_back(&out, Token(TIMES));
 				break;
 			case '/':
