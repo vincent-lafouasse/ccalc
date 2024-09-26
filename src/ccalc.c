@@ -14,6 +14,7 @@ static bool string_empty(const char *str)
 	{
 		if (!isspace(str[i]))
 			return (false);
+		i++;
 	}
 	return (true);
 }
