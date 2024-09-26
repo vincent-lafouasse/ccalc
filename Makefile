@@ -11,16 +11,6 @@ LDFLAGS = -lreadline
 OBJS := $(SRCS:%=build/%.o)
 DEPS := $(OBJS:.o=.d)
 
-LIBFT_PATH = ./lib/libft
-LIBFT = $(LIBFT_PATH)/libft.a
-LIBFT_INCLUDE_DIR = $(LIBFT_PATH)/include
-LIBFT_MAKE_DIR = $(LIBFT_PATH)
-
-CPPFLAGS += -I$(LIBFT_INCLUDE_DIR)
-LDFLAGS += $(LIBFT)
-
-LIBS = $(LIBFT)
-
 .PHONY: all
 all: build
 
@@ -39,9 +29,6 @@ $(NAME): $(OBJS) $(LIBS)
 build/%.c.o: %.c
 	mkdir -p $(dir $@)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
-
-$(LIBFT):
-	make -C $(LIBFT_MAKE_DIR)
 
 .PHONY: re
 re: fclean build
