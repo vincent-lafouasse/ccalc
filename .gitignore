@@ -5,6 +5,7 @@ target/
 Testing
 .vscode
 
+ccalc
 local*
 *.a
 valgrind*
