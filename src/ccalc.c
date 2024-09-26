@@ -1,33 +1,27 @@
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <ctype.h>
-#include "readline/readline.h"
-#include "readline/history.h"
+#include "tokenize/t_token_list/t_token_list.h"
+#include "log/log.h"
 
-static bool string_empty(const char *str)
+#include <stddef.h>
+
+t_token Token(t_token_type ty)
 {
-	size_t i;
-
-	i = 0;
-	while (str[i] != '\0')
-	{
-		if (!isspace(str[i]))
-			return (false);
-		i++;
-	}
-	return (true);
+	return (t_token){.type = ty};
+}
+t_token Integer(int self)
+{
+	return (t_token){.type = INTEGER, .value = self};
 }
 
 int main(void)
 {
-	char *line;
+	t_token_list* tokens = NULL;
+	tkl_push_back(&tokens, Token(LPAREN));
+	tkl_push_back(&tokens, Integer(42));
+	tkl_push_back(&tokens, Token(PLUS));
+	tkl_push_back(&tokens, Integer(69));
+	tkl_push_back(&tokens, Token(RPAREN));
+	tkl_push_back(&tokens, Token(DIVIDES));
+	tkl_push_back(&tokens, Integer(0));
 
-	while ((line = readline("$ ")))
-	{
-		printf("%s\n", line);
-		if (!string_empty(line))
-			add_history(line);
-		free(line);
-	}
+	log_token_list(tokens);
 }
