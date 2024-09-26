@@ -53,6 +53,12 @@ t_token_list* tokenize(const char* in)
 			case '/':
 				tkl_push_back(&out, Token(DIVIDES));
 				break;
+			case '(':
+				tkl_push_back(&out, Token(LPAREN));
+				break;
+			case ')':
+				tkl_push_back(&out, Token(RPAREN));
+				break;
 			default:
 				value = atoi(in);
 				tkl_push_back(&out, Integer(value));
