@@ -14,11 +14,11 @@ void log_token_list(const t_token_list *tkl)
 {
     while (tkl)
     {
-        printf("token:\t");
         log_token(tkl->token);
-        printf("\n");
+        printf(" ");
         tkl = tkl->next;
     }
+    printf("\n");
 }
 
 void log_error(t_error err)
