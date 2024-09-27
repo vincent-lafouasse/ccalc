@@ -22,14 +22,28 @@ bool	parser_matches_one_of(const t_parser *parser, const t_token_type types[], s
 	return (false);
 }
 
-bool	parser_match_terminal(t_parser *parser, t_token_type type)
+__attribute__((warn_unused_result))
+bool	parser_produce_push(t_parser *parser, t_symbol (*prod)(t_parser *), t_symbol_array *out)
 {
-	bool matches;
+	t_symbol symbol;
+
+	symbol = prod(parser);
+	symbol_array_push(out, symbol);
+	return (parser->err == NO_ERROR);
+}
+
+__attribute__((warn_unused_result))
+bool	parser_accept_push(t_parser *parser, t_token_type type, t_symbol_array *out)
+{
+	bool	matches;
+	t_symbol symbol;
 
 	matches = parser_matches(parser, type);
-	if (matches)
-		parser_advance_token(parser);
-	return (matches);
+	if (!matches)
+		return false;
+	symbol = symbol_new_terminal(parser_advance_token(parser));
+	symbol_array_push(out, symbol);
+	return true;
 }
 
 const t_token	*parser_peek_token(const t_parser *parser)
@@ -37,12 +51,13 @@ const t_token	*parser_peek_token(const t_parser *parser)
 	return (&parser->current_token->token);
 }
 
-t_token	*parser_advance_token(t_parser *parser)
+t_token	parser_advance_token(t_parser *parser)
 {
-	t_token	*token;
+	t_token	token;
 
-	token = &parser->current_token->token;
-	if (token->type != EOF_TOKEN)
+	token = parser->current_token->token;
+	if (token.type != EOF_TOKEN)
 		parser->current_token = parser->current_token->next;
+	// TODO: clear node either here or at the top of parse
 	return (token);
 }

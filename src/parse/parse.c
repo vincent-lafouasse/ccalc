@@ -1,160 +1,7 @@
-#include <stdio.h>
-#include "error/t_error.h"
-#include "parse/parse.h"
-#include "parse/t_parse_tree.h"
-#include "t_parser.h"
-
-t_parse_tree_node	*produce_expr(t_parser *state);
-t_parse_tree_node	*produce_expr_rest(t_parser *state);
-t_parse_tree_node	*produce_term(t_parser *state);
-t_parse_tree_node	*produce_term_rest(t_parser *state);
-t_parse_tree_node	*produce_factor(t_parser *state);
-
-void *node_list_clear(void *)
-{
-	return NULL;
-}
-
-void *parse_tree_clear(void *)
-{
-	return NULL;
-}
-
-t_error parse(const t_token_list* tokens)
-{
-	t_parser state = parser_new(tokens);
-
-	*out = produce_expr(&state, out);
-	if (state.err != NO_ERROR)
-	{
-		return (parse_tree_clear(out), state.err);
-	}
-	if (!parser_matches(&state, EOF_TOKEN))
-	{
-		return (parse_tree_clear(out), E_UNEXPECTED_TOKEN);
-	}
-	return NO_ERROR;
-}
-
-t_parse_tree_node	*produce_expr(t_parser *state)
-{
-	t_parser_error err;
-	t_parse_tree_node *out;
-	t_parse_tree_node *term;
-	t_parse_tree_node *expr_rest;
-
-	out = NonTerminal(EXPR);
-	if (!out)
-		return NULL;
-	term = produce_term(state);
-	if (!node_list_push_back(&out->data.children, term))
-	{
-		parse_tree_clear(out);
-		state->err = E_OOM;
-		return NULL;
-	}
-	expr_rest = produce_expr_rest(state, expr_rest);
-	if (state->err != NO_ERROR)
-	{
-		parse_tree_clear(out);
-		return NULL;
-	}
-	if (!node_list_push_back(&out->data.children, expr_rest))
-	{
-		parse_tree_clear(out);
-		state->err = E_OOM;
-		return NULL;
-	}
-	return parser_ok();
-}
-
-t_parse_tree_node	*produce_expr_rest(t_parser *state)
-{
-	t_parser_error err;
-	t_parse_tree_node *term;
-	t_parse_tree_node *expr_rest;
-
-	if (parser_match_terminal(state, PLUS))
-	{
-		if (produce_term(state, out).type == OK)
-		{
-			if (produce_expr_rest(state, out).type == OK)
-			{
-				return parser_ok();
-			}
-		}
-	}
-	else if (parser_match_terminal(state, MINUS))
-	{
-		if (produce_term(state, out).type == OK)
-		{
-			if (produce_expr_rest(state, out).type == OK)
-			{
-				return parser_ok();
-			}
-		}
-	}
-	else if (parser_matches_one_of(state, (t_token_type[]){EOF_TOKEN, RPAREN}, 2))
-	{
-		return parser_ok();
-	}
-	state->err = E_UNEXPECTED_TOKEN
-}
-
-t_parse_tree_node	*produce_term(t_parser *state)
-{
-	if (produce_factor(state, out).type == OK)
-	{
-		if (produce_term_rest(state, out).type == OK)
-		{
-			return parser_ok();
-		}
-	}
-	state->err = E_UNEXPECTED_TOKEN
-}
-
-t_parse_tree_node	*produce_term_rest(t_parser *state)
-{
-	if (parser_match_terminal(state, TIMES))
-	{
-		if (produce_factor(state, out).type == OK)
-		{
-			if (produce_term_rest(state, out).type == OK)
-			{
-				return parser_ok();
-			}
-		}
-	}
-	else if (parser_match_terminal(state, DIVIDES))
-	{
-		if (produce_factor(state, out).type == OK)
-		{
-			if (produce_term_rest(state, out).type == OK)
-			{
-				return parser_ok();
-			}
-		}
-	}
-	else if (parser_matches_one_of(state, (t_token_type[]){PLUS, MINUS, RPAREN, EOF_TOKEN}, 4))
-	{
-		return parser_ok();
-	}
-	state->err = E_UNEXPECTED_TOKEN
-}
-
-void *cleanup_propagate(t_parser *state, t_parse_tree_node *out, t_error err)
-{
-	parse_tree_clear(out);
-	if (err != NO_ERROR)
-		state->err = err;
-	return (NULL);
-}
-
-t_parse_tree_node	*produce_factor(t_parser *state)
-{
-	t_parse_tree_node *out;
-	t_parse_tree_node *paren;
-	t_parse_tree_node *expr;
+/*
+	t_symbol out;
+	t_symbol paren;
+	t_symbol expr;
 
 	if (parser_matches(state, INTEGER))
 	{
@@ -190,4 +37,177 @@ t_parse_tree_node	*produce_factor(t_parser *state)
 	}
 	state->err = E_UNEXPECTED_TOKEN
 	return NULL;
+*/
+#include <stdio.h>
+#include "error/t_error.h"
+#include "parse/parse.h"
+#include "parse/t_symbol.h"
+#include "t_parser.h"
+
+/* productions may or may not return a half-initialized t_symbol object */
+t_symbol	produce_expr(t_parser *state);
+t_symbol	produce_expr_rest(t_parser *state);
+t_symbol	produce_term(t_parser *state);
+t_symbol	produce_term_rest(t_parser *state);
+t_symbol	produce_factor(t_parser *state);
+
+void *node_list_clear(void *)
+{
+	return NULL;
+}
+
+void *parse_tree_clear(void *)
+{
+	return NULL;
+}
+
+t_error parse(const t_token_list* tokens)
+{
+	t_parser state = parser_new(tokens);
+
+	*out = produce_expr(&state, out);
+	if (state.err != NO_ERROR)
+	{
+		return (parse_tree_clear(out), state.err);
+	}
+	if (!parser_matches(&state, EOF_TOKEN))
+	{
+		return (parse_tree_clear(out), E_UNEXPECTED_TOKEN);
+	}
+	return NO_ERROR;
+}
+
+t_symbol	produce_expr(t_parser *state)
+{
+	t_parser_error err;
+	t_symbol out;
+	t_symbol term;
+	t_symbol expr_rest;
+
+	out = NonTerminal(EXPR);
+	if (!out)
+		return NULL;
+	term = produce_term(state);
+	if (!node_list_push_back(&out->data.children, term))
+	{
+		parse_tree_clear(out);
+		state->err = E_OOM;
+		return NULL;
+	}
+	expr_rest = produce_expr_rest(state, expr_rest);
+	if (state->err != NO_ERROR)
+	{
+		parse_tree_clear(out);
+		return NULL;
+	}
+	if (!node_list_push_back(&out->data.children, expr_rest))
+	{
+		parse_tree_clear(out);
+		state->err = E_OOM;
+		return NULL;
+	}
+	return parser_ok();
+}
+
+t_symbol	produce_expr_rest(t_parser *state)
+{
+	t_parser_error err;
+	t_symbol term;
+	t_symbol expr_rest;
+
+	if (parser_match_terminal(state, PLUS))
+	{
+		if (produce_term(state, out).type == OK)
+		{
+			if (produce_expr_rest(state, out).type == OK)
+			{
+				return parser_ok();
+			}
+		}
+	}
+	else if (parser_match_terminal(state, MINUS))
+	{
+		if (produce_term(state, out).type == OK)
+		{
+			if (produce_expr_rest(state, out).type == OK)
+			{
+				return parser_ok();
+			}
+		}
+	}
+	else if (parser_matches_one_of(state, (t_token_type[]){EOF_TOKEN, RPAREN}, 2))
+	{
+		return parser_ok();
+	}
+	state->err = E_UNEXPECTED_TOKEN
+}
+
+t_symbol	produce_term(t_parser *state)
+{
+	if (produce_factor(state, out).type == OK)
+	{
+		if (produce_term_rest(state, out).type == OK)
+		{
+			return parser_ok();
+		}
+	}
+	state->err = E_UNEXPECTED_TOKEN
+}
+
+t_symbol	*produce_term_rest(t_parser *state)
+{
+	if (parser_match_terminal(state, TIMES))
+	{
+		if (produce_factor(state, out).type == OK)
+		{
+			if (produce_term_rest(state, out).type == OK)
+			{
+				return parser_ok();
+			}
+		}
+	}
+	else if (parser_match_terminal(state, DIVIDES))
+	{
+		if (produce_factor(state, out).type == OK)
+		{
+			if (produce_term_rest(state, out).type == OK)
+			{
+				return parser_ok();
+			}
+		}
+	}
+	else if (parser_matches_one_of(state, (t_token_type[]){PLUS, MINUS, RPAREN, EOF_TOKEN}, 4))
+	{
+		return parser_ok();
+	}
+	state->err = E_UNEXPECTED_TOKEN
+}
+
+void *cleanup_propagate(t_parser *state, t_symbol *out, t_error err)
+{
+	parse_tree_clear(out);
+	if (err != NO_ERROR)
+		state->err = err;
+	return (NULL);
+}
+
+bool symbol_is_valid(const t_symbol *);
+
+t_symbol	produce_factor(t_parser *state)
+{
+	t_symbol	symbol;
+
+	symbol = symbol_new_non_terminal(FACTOR, 3);
+	if (symbol.right_hand_side == NULL)
+		state->err = E_OOM;
+	else if (parser_accept_push(state, INTEGER, symbol.right_hand_side))
+	{}
+	else if (parser_accept_push(state, LPAREN, symbol.right_hand_side))
+	{
+		if (!symbol_produce_push(state, produce_expr, symbol.right_hand_side))
+			return symbol;
+		if (!parser_accept_push(state, RPAREN, symbol.right_hand_side))
+			state->err = E_UNEXPECTED_TOKEN;
+	}
+	return symbol;
 }
