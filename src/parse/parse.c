@@ -44,20 +44,21 @@
 #include "parse/t_symbol.h"
 #include "t_parser.h"
 
-/* productions may or may not return a half-initialized t_symbol object */
+/* productions may or may not return a half-initialized, but always `clear`-able
+t_symbol object */
 t_symbol	produce_expr(t_parser *state);
 t_symbol	produce_expr_rest(t_parser *state);
 t_symbol	produce_term(t_parser *state);
 t_symbol	produce_term_rest(t_parser *state);
 t_symbol	produce_factor(t_parser *state);
 
-void *node_list_clear(void *)
+void *symbol_clear(t_symbol symbol)
 {
-	return NULL;
-}
+	if (symbol.kind == TERMINAL)
+		return NULL;
+	if (symbol.kind != TERMINAL && symbol.right_hand_side == NULL)
+		return NULL;
 
-void *parse_tree_clear(void *)
-{
 	return NULL;
 }
 
