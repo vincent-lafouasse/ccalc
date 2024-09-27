@@ -199,15 +199,23 @@ t_symbol	produce_factor(t_parser *state)
 
 	symbol = symbol_new_non_terminal(FACTOR, 3);
 	if (symbol.right_hand_side == NULL)
-		state->err = E_OOM;
-	else if (parser_accept_push(state, INTEGER, symbol.right_hand_side))
-	{}
-	else if (parser_accept_push(state, LPAREN, symbol.right_hand_side))
 	{
-		if (!symbol_produce_push(state, produce_expr, symbol.right_hand_side))
+		state->err = E_OOM;
+		return symbol;
+	}
+	if (parser_accept_push(state, LPAREN, symbol.right_hand_side))
+	{
+		if (!parser_produce_push(state, produce_expr, symbol.right_hand_side))
 			return symbol;
 		if (!parser_accept_push(state, RPAREN, symbol.right_hand_side))
+		{
 			state->err = E_UNEXPECTED_TOKEN;
+			return symbol;
+		}
+		return symbol;
 	}
+	if (parser_accept_push(state, INTEGER, symbol.right_hand_side))
+		return symbol;
+	state->err = E_UNEXPECTED_TOKEN;
 	return symbol;
 }
