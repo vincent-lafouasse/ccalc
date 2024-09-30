@@ -42,6 +42,7 @@
 #include "error/t_error.h"
 #include "parse/t_symbol.h"
 #include "t_parser.h"
+#include "log/tree_to_json.h"
 #include <stdio.h>
 
 /* productions may or may not return a half-initialized, but always `clear`-able
@@ -77,6 +78,7 @@ t_error parse(const t_token_list *tokens)
         symbol_clear(root);
         return E_UNEXPECTED_TOKEN;
     }
+    tree_to_json(&root);
     return NO_ERROR;
 }
 

@@ -108,6 +108,7 @@ int main(void)
 {
     char *line;
     t_token_list *tokens;
+    t_error err;
 
     while ((line = readline("$ ")))
     {
@@ -115,11 +116,14 @@ int main(void)
             add_history(line);
         tokens = tokenize(line);
         log_token_list(tokens);
-        // if (parse(tokens))
-        //	printf("ok\n");
-        // else
-        //	printf("rip bozo\n");
+
+        err = parse(tokens);
+        if (err == NO_ERROR)
+            printf("ok\n");
+        else
+            printf("rip bozo\n");
         free(line);
+
         tkl_clear(&tokens);
     }
 }
