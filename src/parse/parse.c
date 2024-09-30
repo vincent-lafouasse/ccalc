@@ -156,25 +156,13 @@ t_symbol	produce_term(t_parser *state)
 
 	if (!parser_produce_push(state, &produce_factor, symbol.right_hand_side))
 	{
-		state->err = E_UNEXPECTED_TOKEN
 		return symbol;
 	}
 	if (!parser_produce_push(state, &produce_term, symbol.right_hand_side))
 	{
-		state->err = E_UNEXPECTED_TOKEN
 		return symbol;
 	}
 	return symbol;
-}
-
-	if (produce_factor(state, out).type == OK)
-	{
-		if (produce_term_rest(state, out).type == OK)
-		{
-			return parser_ok();
-		}
-	}
-	state->err = E_UNEXPECTED_TOKEN
 }
 
 t_symbol	*produce_term_rest(t_parser *state)
