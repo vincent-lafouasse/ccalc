@@ -66,48 +66,40 @@ t_error parse(const t_token_list* tokens)
 {
 	t_parser state = parser_new(tokens);
 
-	*out = produce_expr(&state, out);
+	t_symbol root = produce_expr(&state);
 	if (state.err != NO_ERROR)
 	{
-		return (parse_tree_clear(out), state.err);
+		symbol_clear(root);
+		return state.err;
 	}
-	if (!parser_matches(&state, EOF_TOKEN))
+	if (parser_peek_token(&state)->type != EOF_TOKEN)
 	{
-		return (parse_tree_clear(out), E_UNEXPECTED_TOKEN);
+		symbol_clear(root);
+		return E_UNEXPECTED_TOKEN;
 	}
 	return NO_ERROR;
 }
 
 t_symbol	produce_expr(t_parser *state)
 {
-	t_parser_error err;
-	t_symbol out;
-	t_symbol term;
-	t_symbol expr_rest;
+	t_symbol symbol;
 
-	out = NonTerminal(EXPR);
-	if (!out)
-		return NULL;
-	term = produce_term(state);
-	if (!node_list_push_back(&out->data.children, term))
+	symbol = symbol_new_non_terminal(EXPR, 2);
+	if (symbol.right_hand_side == NULL)
 	{
-		parse_tree_clear(out);
 		state->err = E_OOM;
-		return NULL;
+		return symbol;
 	}
-	expr_rest = produce_expr_rest(state, expr_rest);
-	if (state->err != NO_ERROR)
+
+	if (!parser_produce_push(state, &produce_term, symbol.right_hand_side))
 	{
-		parse_tree_clear(out);
-		return NULL;
+		return symbol;
 	}
-	if (!node_list_push_back(&out->data.children, expr_rest))
+	if (!parser_produce_push(state, &produce_expr_rest, symbol.right_hand_side))
 	{
-		parse_tree_clear(out);
-		state->err = E_OOM;
-		return NULL;
+		return symbol;
 	}
-	return parser_ok();
+	return symbol;
 }
 
 t_symbol	produce_expr_rest(t_parser *state)
