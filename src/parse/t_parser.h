@@ -15,7 +15,8 @@ struct s_parser
 
 static t_parser parser_new(const t_token_list *tokens)
 {
-    return ((t_parser){tokens, tokens});
+    return (
+        (t_parser){._head = tokens, .current_token = tokens, .err = NO_ERROR});
 }
 
 bool parser_matches(const t_parser *parser, t_token_type ty);
