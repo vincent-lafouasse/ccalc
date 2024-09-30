@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-const char* node_repr(enum e_symbol_kind kind)
+static const char* node_repr(enum e_symbol_kind kind)
 {
 
     if (kind == TERMINAL)
@@ -20,8 +20,37 @@ const char* node_repr(enum e_symbol_kind kind)
     return "???";
 }
 
-void print_node(const t_symbol* node)
+void print_node(const t_symbol* node);
+
+void print_terminal(const t_symbol* node)
 {
+    printf("{");
+
+    printf("text: { name: \"");
+    if (node->token.type == INTEGER)
+        printf("%d", node->token.value);
+    else
+        printf("%s", token_repr(node->token));
+    printf("\"}");
+
+    printf("children: [],");
+
+    printf("}");
+}
+
+void print_non_terminal(const t_symbol* node)
+{
+    printf("{");
+
+    printf("text: { name: \"%s\" },", node_repr(node->kind));
+
+
+
+    printf("children: [");
+
+    printf("],");
+
+    printf("}");
 }
 
 void tree_to_json(const t_symbol *root)
