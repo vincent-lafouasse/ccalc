@@ -163,31 +163,39 @@ t_symbol	produce_term(t_parser *state)
 
 t_symbol	produce_term_rest(t_parser *state)
 {
-	if (parser_match_terminal(state, TIMES))
+	t_symbol symbol = symbol_new_non_terminal(TERM_REST, 3);
+	if (symbol.right_hand_side == NULL)
 	{
-		if (produce_factor(state, out).type == OK)
-		{
-			if (produce_term_rest(state, out).type == OK)
-			{
-				return parser_ok();
-			}
-		}
+		state->err = E_OOM;
+		return symbol;
 	}
-	else if (parser_match_terminal(state, DIVIDES))
+
+	if (parser_accept_push(state, TIMES, symbol.right_hand_side))
 	{
-		if (produce_factor(state, out).type == OK)
-		{
-			if (produce_term_rest(state, out).type == OK)
-			{
-				return parser_ok();
-			}
-		}
+		if (!parser_produce_push(state, &produce_factor, symbol.right_hand_side))
+			return symbol;
+		if (!parser_produce_push(state, &produce_term_rest, symbol.right_hand_side))
+			return symbol;
+		return symbol;
 	}
-	else if (parser_matches_one_of(state, (t_token_type[]){PLUS, MINUS, RPAREN, EOF_TOKEN}, 4))
+
+	if (parser_accept_push(state, DIVIDES, symbol.right_hand_side))
 	{
-		return parser_ok();
+		if (!parser_produce_push(state, &produce_factor, symbol.right_hand_side))
+			return symbol;
+		if (!parser_produce_push(state, &produce_term_rest, symbol.right_hand_side))
+			return symbol;
+		return symbol;
 	}
-	state->err = E_UNEXPECTED_TOKEN
+
+	if (parser_accept_push(state, EOF_TOKEN, symbol.right_hand_side) ||
+		parser_accept_push(state, RPAREN, symbol.right_hand_side))
+	{
+		return symbol;
+	}
+
+	state->err = E_UNEXPECTED_TOKEN;
+	return symbol;
 }
 
 t_symbol	produce_factor(t_parser *state)
