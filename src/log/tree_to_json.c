@@ -71,7 +71,7 @@ void print_non_terminal(const t_symbol* node)
 void tree_to_json(const t_symbol *root)
 {
     (void)root;
-    printf("parse_tree = {");
+    printf("var parse_tree = {");
 
     printf("chart: { container: \"#tree-simple\" },");
 
