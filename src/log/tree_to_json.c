@@ -40,7 +40,7 @@ void print_terminal(const t_symbol* node)
         printf("%d", node->token.value);
     else
         printf("%s", token_repr(node->token));
-    printf("\"}");
+    printf("\"},");
 
     printf("children: [],");
 
