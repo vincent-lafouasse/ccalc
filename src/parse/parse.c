@@ -133,8 +133,7 @@ t_symbol produce_expr_rest(t_parser *state)
         return symbol;
     }
 
-    if (parser_accept_push(state, EOF_TOKEN, symbol.right_hand_side) ||
-        parser_accept_push(state, RPAREN, symbol.right_hand_side))
+    if (parser_matches_one_of(state, (t_token_type[]){EOF_TOKEN, RPAREN}, 2))
     {
         return symbol;
     }
@@ -196,8 +195,7 @@ t_symbol produce_term_rest(t_parser *state)
         return symbol;
     }
 
-    if (parser_accept_push(state, EOF_TOKEN, symbol.right_hand_side) ||
-        parser_accept_push(state, RPAREN, symbol.right_hand_side))
+    if (parser_matches_one_of(state, (t_token_type[]){EOF_TOKEN, RPAREN, PLUS, MINUS}, 4))
     {
         return symbol;
     }
