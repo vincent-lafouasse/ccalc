@@ -157,7 +157,7 @@ t_symbol produce_term(t_parser *state)
     {
         return symbol;
     }
-    if (!parser_produce_push(state, &produce_term, symbol.right_hand_side))
+    if (!parser_produce_push(state, &produce_term_rest, symbol.right_hand_side))
     {
         return symbol;
     }
