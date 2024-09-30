@@ -145,6 +145,28 @@ t_symbol	produce_expr_rest(t_parser *state)
 
 t_symbol	produce_term(t_parser *state)
 {
+	t_symbol	symbol;
+
+	symbol = symbol_new_non_terminal(TERM, 2);
+	if (symbol.right_hand_side == NULL)
+	{
+		state->err = E_OOM;
+		return symbol;
+	}
+
+	if (!parser_produce_push(state, &produce_factor, symbol.right_hand_side))
+	{
+		state->err = E_UNEXPECTED_TOKEN
+		return symbol;
+	}
+	if (!parser_produce_push(state, &produce_term, symbol.right_hand_side))
+	{
+		state->err = E_UNEXPECTED_TOKEN
+		return symbol;
+	}
+	return symbol;
+}
+
 	if (produce_factor(state, out).type == OK)
 	{
 		if (produce_term_rest(state, out).type == OK)
@@ -183,16 +205,6 @@ t_symbol	*produce_term_rest(t_parser *state)
 	}
 	state->err = E_UNEXPECTED_TOKEN
 }
-
-void *cleanup_propagate(t_parser *state, t_symbol *out, t_error err)
-{
-	parse_tree_clear(out);
-	if (err != NO_ERROR)
-		state->err = err;
-	return (NULL);
-}
-
-bool symbol_is_valid(const t_symbol *);
 
 t_symbol	produce_factor(t_parser *state)
 {
